@@ -1,0 +1,70 @@
+<html>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/loader.js"></script>
+<style>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .editor {
+    width: 100%;
+    height: 500px;
+  }
+
+</style>
+
+<body>
+  <div class="editor" id="editorCodeJson"></div>
+  <script>
+    // Initial data
+    let code = `{\n\t"response": "Hello, World!"\n}`;
+
+    const editorCode = document.getElementById("editorCodeJson");
+
+    // Monaco loader
+    require.config({
+      paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor/min/vs" }
+    });
+
+    window.MonacoEnvironment = {
+      getWorkerUrl: function (workerId, label) {
+        return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+        self.MonacoEnvironment = {
+          baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor/min/'
+        };
+        importScripts('https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/base/worker/workerMain.js');`)}`;
+      }
+    };
+
+    // Monaco init
+    require(["vs/editor/editor.main"], function () {
+      createEditor(editorCode);
+    });
+
+    function createEditor(editorContainer) {
+      let editor = monaco.editor.create(editorContainer, {
+        value: code,
+        language: "json",
+        automaticLayout: true,
+        contextmenu: false,
+        fontSize: 14,
+        readOnly: true,
+        theme: "vs-dark",
+      });
+
+      // Receive message event from parent
+      window.addEventListener("message", function (event) {
+        console.log("evn on msg", event.data)
+        if (event.data && event.data.jsonCode) {
+          code = JSON.stringify(event.data.jsonCode, null, 2);
+          editor.setValue(code);
+        }
+      });
+    }
+
+  </script>
+</body>
+
+</html>

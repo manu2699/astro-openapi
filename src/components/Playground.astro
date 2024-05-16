@@ -1,0 +1,140 @@
+---
+export const prerender = true;
+---
+
+<astro:fragment>
+	<form
+		id='form'
+		class='font-sans w-full flex flex-col gap-2 p-4 bg-blue-100 rounded-md shadow-md mt-4'
+	>
+		<div class='flex flex-col gap-1'>
+			<label class='text-black text-base' for='key-id'>
+				X-Acess-Key-Id
+			</label>
+			<input
+				type='text'
+				name='key-id'
+				placeholder='Enter your X-Access-Key-Id'
+				required
+				class='border rounded-md p-2'
+			/>
+		</div>
+		<div class='flex flex-col gap-1'>
+			<label class='text-black text-base' for='key-id'>
+				X-Acess-Key-Secret
+			</label>
+			<input
+				type='text'
+				name='key-secret'
+				required
+				placeholder='Enter your X-Access-Key-Secret'
+				class='border rounded-md p-2'
+			/>
+		</div>
+		<div class='flex flex-col gap-1'>
+			<label class='text-black text-base' for='url'> Url </label>
+			<input
+				type='text'
+				name='url'
+				required
+				placeholder='Enter URL'
+				value="https://domain.kissflow.com/"
+				class='border rounded-md p-2'
+			/>
+			<label class='text-red-400 text-base' id='url-error'></label>
+		</div>
+		<button
+			class='bg-blue-500 w-[200px] self-end rounded-md p-2 text-white hover:bg-slate-400 transition-colors'
+		>
+			Try it
+		</button>
+	</form>
+
+	<div class='w-full h-[250px] p-2'>
+		Code
+		<iframe
+			id='jsmonaco'
+			src='monaco.js.html'
+			class='w-full'
+			style='height:250px'></iframe>
+	</div>
+
+	<div class='mt-[30px] w-full h-[200px] p-2'>
+		Output
+		<iframe
+			id='jsonmonaco'
+			src='monaco.json.html'
+			class='w-full'
+			style='height:200px'></iframe>
+	</div>
+
+	<script>
+		// Form actions
+		import { actions } from "astro:actions";
+
+		const form = document.getElementById("form") as HTMLFormElement;
+
+		function sendCodeToJS({
+			url,
+			keyId,
+			keySecret
+		}: {
+			url: string;
+			keyId: string;
+			keySecret: string;
+		}) {
+			const jsMonacoIframe = document.getElementById(
+				"jsmonaco"
+			) as HTMLIFrameElement;
+			if (jsMonacoIframe.contentWindow) {
+				let code = `fetch("{{yourdomain}}", {\n\tmethod: "GET",\n\theaders: {\n\t\t"X-Access-Key-Id": "{{key-id}}",\n\t\t"X-Access-Key-Secret": "{{key-secret}}"\n\t}\n})\n.then(response => response.json())\n.then(json => console.log(json))`;
+				code = code.replace("{{yourdomain}}", url);
+				code = code.replace("{{key-id}}", keyId);
+				code = code.replace("{{key-secret}}", keySecret);
+				jsMonacoIframe.contentWindow.postMessage(
+					{ type: "code-change", jsCode: code },
+					"*"
+				);
+			}
+		}
+
+		function sendResponseToJson(json: any) {
+			const jsonMonacoIframe = document.getElementById(
+				"jsonmonaco"
+			) as HTMLIFrameElement;
+			if (jsonMonacoIframe.contentWindow) {
+				jsonMonacoIframe.contentWindow.postMessage(
+					{ type: "json-change", jsonCode: json },
+					"*"
+				);
+			}
+		}
+
+		async function handleSubmit(e: Event) {
+			e.preventDefault();
+
+			const formData = new FormData(form);
+			const { data, error } = await actions.fetch.safe(formData);
+			// console.log("resp check", { data, error });
+
+			let errorLabel = document.getElementById(
+				"url-error"
+			) as HTMLElement;
+
+			if (error) {
+				errorLabel.innerText = "Please enter a valid URL";
+				return;
+			} else {
+				errorLabel.innerText = "";
+				sendCodeToJS({
+					url: formData.get("url") as string,
+					keyId: formData.get("key-id") as string,
+					keySecret: formData.get("key-secret") as string
+				});
+				sendResponseToJson(data);
+			}
+		}
+
+		form.addEventListener("submit", handleSubmit);
+	</script>
+</astro:fragment>

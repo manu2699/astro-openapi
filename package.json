@@ -1,0 +1,28 @@
+{
+  "name": "docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.3.4",
+    "@astrojs/starlight": "^0.22.2",
+    "@astrojs/tailwind": "^5.1.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@webcontainer/api": "^1.1.9",
+    "astro": "^4.8.2",
+    "react": "^18.3.1",
+    "react-code-blocks": "^0.1.6",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.32.5",
+    "starlight-openapi": "^0.6.3",
+    "tailwindcss": "^3.4.3",
+    "xterm": "^5.3.0"
+  }
+}
