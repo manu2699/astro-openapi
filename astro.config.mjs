@@ -2,16 +2,20 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightOpenAPI, { openAPISidebarGroups } from "starlight-openapi";
 import react from "@astrojs/react";
-
 import tailwind from "@astrojs/tailwind";
+
+import vercel from "@astrojs/vercel/serverless";
 
 // https://astro.build/config
 export default defineConfig({
-	output: "server", // or 'server'
+	output: "server",
 	experimental: {
 		actions: true
 	},
+	adapter: vercel(),
 	integrations: [
+		react(),
+		tailwind(),
 		starlight({
 			title: "API Docs",
 			social: {
@@ -43,8 +47,6 @@ export default defineConfig({
 				},
 				...openAPISidebarGroups
 			]
-		}),
-		react(),
-		tailwind()
+		})
 	]
 });
