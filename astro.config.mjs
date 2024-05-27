@@ -1,6 +1,8 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import starlightOpenAPI, { openAPISidebarGroups } from "starlight-openapi";
+import starlightOpenAPI, {
+	openAPISidebarGroups
+} from "starlight-openapi-rapidoc";
 import react from "@astrojs/react";
 import tailwind from "@astrojs/tailwind";
 
@@ -28,7 +30,8 @@ export default defineConfig({
 					{
 						base: "case",
 						label: "Case API",
-						schema: "./schemas/case.json"
+						schema: "./schemas/case.json",
+						showMethodBadgeSidebar: true
 					},
 					{
 						base: "process",
